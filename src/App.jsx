@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
 import { vehicles } from './vehicles'
 
@@ -10,6 +10,21 @@ const metrics = [
   { key: 'engine', label: 'Engine (cc)' },
 ]
 
+function VehicleCard({ v }) {
+  return (
+    <div className="card">
+      <h2>{v.name}</h2>
+      <p><span>Brand</span> {v.brand}</p>
+      <p><span>Type</span> {v.type}</p>
+      <p><span>Price</span> ₹{v.price} lakh</p>
+      <p><span>Mileage</span> {v.mileage} km/l</p>
+      <p><span>Engine</span> {v.engine} cc</p>
+      <p><span>Power</span> {v.power} bhp</p>
+      <p><span>Seats</span> {v.seats}</p>
+    </div>
+  )
+}
+
 function App() {
   const [firstId, setFirstId] = useState(1)
   const [secondId, setSecondId] = useState(2)
@@ -18,18 +33,17 @@ function App() {
   const second = vehicles.find((v) => v.id === Number(secondId))
 
   return (
-    <div>
+    <div className="app">
       <h1>Vehicle Comparison Tool</h1>
+      <p className="subtitle">Pick two vehicles and compare their specs side by side.</p>
 
-      <div>
+      <div className="selectors">
         <select value={firstId} onChange={(e) => setFirstId(e.target.value)}>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>
-
-        <span> vs </span>
-
+        <span className="vs">vs</span>
         <select value={secondId} onChange={(e) => setSecondId(e.target.value)}>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
@@ -38,27 +52,8 @@ function App() {
       </div>
 
       <div className="cards">
-        <div className="card">
-          <h2>{first.name}</h2>
-          <p>Brand: {first.brand}</p>
-          <p>Type: {first.type}</p>
-          <p>Price: ₹{first.price} lakh</p>
-          <p>Mileage: {first.mileage} km/l</p>
-          <p>Engine: {first.engine} cc</p>
-          <p>Power: {first.power} bhp</p>
-          <p>Seats: {first.seats}</p>
-        </div>
-
-        <div className="card">
-          <h2>{second.name}</h2>
-          <p>Brand: {second.brand}</p>
-          <p>Type: {second.type}</p>
-          <p>Price: ₹{second.price} lakh</p>
-          <p>Mileage: {second.mileage} km/l</p>
-          <p>Engine: {second.engine} cc</p>
-          <p>Power: {second.power} bhp</p>
-          <p>Seats: {second.seats}</p>
-        </div>
+        <VehicleCard v={first} />
+        <VehicleCard v={second} />
       </div>
 
       <div className="charts">
@@ -72,10 +67,10 @@ function App() {
                   { name: second.name, value: second[m.key] },
                 ]}
               >
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="value" fill="#3b82f6" />
+                <Bar dataKey="value" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
