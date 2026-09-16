@@ -27,4 +27,18 @@ select {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px;
+}.charts {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.chart {
+  flex: 1;
+  min-width: 250px;
+}
+
+.chart h3 {
+  margin-bottom: 8px;
 }
