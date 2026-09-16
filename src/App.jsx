@@ -7,6 +7,7 @@ const metrics = [
   { key: 'price', label: 'Price (₹ lakh)' },
   { key: 'mileage', label: 'Mileage (km/l)' },
   { key: 'power', label: 'Power (bhp)' },
+  { key: 'engine', label: 'Engine (cc)' },
 ]
 
 function App() {
