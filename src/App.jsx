@@ -11,6 +11,21 @@ function formatValue(field, value) {
   return `${field.prefix || ''}${value}${field.suffix}`
 }
 
+// Read ?type=...&a=...&b=... from the address, and fix anything invalid
+function readUrl(data) {
+  const params = new URLSearchParams(window.location.search)
+  const type = params.get('type')
+  const key = data[type] ? type : 'cars'
+  const items = data[key].items
+  const a = Number(params.get('a'))
+  const b = Number(params.get('b'))
+  return {
+    key,
+    a: items.some((v) => v.id === a) ? a : items[0].id,
+    b: items.some((v) => v.id === b) ? b : items[1].id,
+  }
+}
+
 function VehicleCard({ v, other, fields, side }) {
   return (
     <div className={`card ${side}`}>
@@ -32,7 +47,16 @@ function App() {
   const [categoryKey, setCategoryKey] = useState('cars')
   const [firstId, setFirstId] = useState(1)
   const [secondId, setSecondId] = useState(2)
+  const [copied, setCopied] = useState(false)
 
+  function applyUrl(data) {
+    const state = readUrl(data)
+    setCategoryKey(state.key)
+    setFirstId(state.a)
+    setSecondId(state.b)
+  }
+
+  // 1. Load data from the API, then set the page from the address
   useEffect(() => {
     fetch('/api/vehicles')
       .then((res) => {
@@ -40,6 +64,7 @@ function App() {
         return res.json()
       })
       .then((data) => {
+        applyUrl(data)
         setCategories(data)
         setLoading(false)
       })
@@ -48,6 +73,35 @@ function App() {
         setLoading(false)
       })
   }, [])
+
+  // 2. Whenever the choice changes, write it into the address
+  useEffect(() => {
+    if (!categories) return
+    const params = new URLSearchParams({ type: categoryKey, a: firstId, b: secondId })
+    const newSearch = `?${params.toString()}`
+    if (window.location.search === newSearch) return
+    if (window.location.search === '') {
+      window.history.replaceState(null, '', newSearch)
+    } else {
+      window.history.pushState(null, '', newSearch)
+    }
+  }, [categories, categoryKey, firstId, secondId])
+
+  // 3. When the user presses Back/Forward, read the address again
+  useEffect(() => {
+    if (!categories) return
+    function onPopState() {
+      applyUrl(categories)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [categories])
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   if (loading) {
     return <div className="app"><p className="status">Loading vehicles…</p></div>
@@ -86,17 +140,20 @@ function App() {
       </div>
 
       <div className="selectors">
-        <select value={firstId} onChange={(e) => setFirstId(e.target.value)}>
+        <select value={firstId} onChange={(e) => setFirstId(Number(e.target.value))}>
           {items.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>
         <span className="vs">VS</span>
-        <select value={secondId} onChange={(e) => setSecondId(e.target.value)}>
+        <select value={secondId} onChange={(e) => setSecondId(Number(e.target.value))}>
           {items.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>
+        <button className="copy-btn" onClick={copyLink}>
+          {copied ? 'Copied!' : 'Copy link'}
+        </button>
       </div>
 
       <p className="legend">Neon green = the better value for that spec.</p>

@@ -204,3 +204,20 @@ h1 {
   color: #ff00aa;
   text-shadow: 0 0 8px rgba(255, 0, 170, 0.7);
 }
+.copy-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 11px 16px;
+  color: #ff00aa;
+  background: rgba(255, 0, 170, 0.1);
+  border: 1px solid #ff00aa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  box-shadow: 0 0 14px rgba(255, 0, 170, 0.6);
+}
