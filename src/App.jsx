@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
 import { categories } from './vehicles'
 
@@ -12,9 +12,9 @@ function formatValue(field, value) {
   return `${field.prefix || ''}${value}${field.suffix}`
 }
 
-function VehicleCard({ v, other, fields }) {
+function VehicleCard({ v, other, fields, side }) {
   return (
-    <div className="card">
+    <div className={`card ${side}`}>
       <h2>{v.name}</h2>
       <p><span>Brand</span> {v.brand}</p>
       {fields.map((f) => (
@@ -65,7 +65,7 @@ function App() {
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>
-        <span className="vs">vs</span>
+        <span className="vs">VS</span>
         <select value={secondId} onChange={(e) => setSecondId(e.target.value)}>
           {items.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
@@ -73,11 +73,11 @@ function App() {
         </select>
       </div>
 
-      <p className="legend">Green = the better value for that spec.</p>
+      <p className="legend">Neon green = the better value for that spec.</p>
 
       <div className="cards">
-        <VehicleCard v={first} other={second} fields={category.fields} />
-        <VehicleCard v={second} other={first} fields={category.fields} />
+        <VehicleCard v={first} other={second} fields={category.fields} side="card-a" />
+        <VehicleCard v={second} other={first} fields={category.fields} side="card-b" />
       </div>
 
       <div className="charts">
@@ -91,10 +91,16 @@ function App() {
                   { name: second.name, value: second[f.key] },
                 ]}
               >
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#8b93b8' }} stroke="#2a2f4a" />
+                <YAxis tick={{ fontSize: 11, fill: '#8b93b8' }} stroke="#2a2f4a" />
+                <Tooltip
+                  cursor={{ fill: 'rgba(0, 240, 255, 0.08)' }}
+                  contentStyle={{ background: '#0a0c1e', border: '1px solid #00f0ff', color: '#e5e7eb' }}
+                />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  <Cell fill="#00f0ff" />
+                  <Cell fill="#ff00aa" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
