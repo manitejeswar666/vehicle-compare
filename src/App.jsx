@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
-import { categories } from './vehicles'
 
 function isBetter(field, mine, theirs) {
   if (mine === theirs) return false
@@ -27,9 +26,36 @@ function VehicleCard({ v, other, fields, side }) {
 }
 
 function App() {
+  const [categories, setCategories] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [categoryKey, setCategoryKey] = useState('cars')
   const [firstId, setFirstId] = useState(1)
   const [secondId, setSecondId] = useState(2)
+
+  useEffect(() => {
+    fetch('/api/vehicles')
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server replied ${res.status}`)
+        return res.json()
+      })
+      .then((data) => {
+        setCategories(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) {
+    return <div className="app"><p className="status">Loading vehicles…</p></div>
+  }
+
+  if (error) {
+    return <div className="app"><p className="status error">Could not load vehicles: {error}</p></div>
+  }
 
   const category = categories[categoryKey]
   const items = category.items
